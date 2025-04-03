@@ -3,50 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Chatbot en GitHub Pages</title>
+    <title>Chatbot n8n</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            text-align: center;
-            padding: 20px;
-        }
-        #chatbox {
-            width: 300px;
-            height: 400px;
-            background: white;
-            border-radius: 10px;
-            padding: 10px;
-            box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
-            margin: auto;
-            overflow-y: scroll;
-        }
-        input {
-            width: 80%;
-            padding: 10px;
-            margin-top: 10px;
-        }
+        body { font-family: Arial, sans-serif; text-align: center; }
+        #chatbox { width: 80%; max-width: 400px; height: 300px; border: 1px solid #ccc; overflow-y: auto; margin: auto; padding: 10px; }
+        input, button { margin-top: 10px; padding: 10px; width: 80%; }
     </style>
 </head>
 <body>
-    <h1>Bienvenido a mi Chatbot</h1>
-    <div id="chatbox">
-        <p><strong>Bot:</strong> ¡Hola! ¿En qué puedo ayudarte?</p>
-    </div>
-    <input type="text" id="userInput" placeholder="Escribe tu mensaje..." onkeypress="sendMessage(event)">
-    
+    <h1>Chatbot n8n</h1>
+    <div id="chatbox"></div>
+    <input type="text" id="userInput" placeholder="Escribe un mensaje...">
+    <button onclick="sendMessage()">Enviar</button>
+
     <script>
-        function sendMessage(event) {
-            if (event.key === 'Enter') {
-                let userMessage = document.getElementById("userInput").value;
-                if (userMessage.trim() !== "") {
-                    let chatbox = document.getElementById("chatbox");
-                    let newMessage = `<p><strong>Tú:</strong> ${userMessage}</p>`;
-                    chatbox.innerHTML += newMessage;
-                    document.getElementById("userInput").value = "";
-                    chatbox.scrollTop = chatbox.scrollHeight;
-                }
-            }
+        function sendMessage() {
+            let inputField = document.getElementById("userInput");
+            let chatbox = document.getElementById("chatbox");
+            let userMessage = inputField.value;
+
+            if (!userMessage) return;
+
+            chatbox.innerHTML += `<p><strong>Tú:</strong> ${userMessage}</p>`;
+            inputField.value = "";
+
+            fetch("TU_WEBHOOK_DE_N8N", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: userMessage })
+            })
+            .then(response => response.json())
+            .then(data => {
+                chatbox.innerHTML += `<p><strong>Bot:</strong> ${data.reply}</p>`;
+            })
+            .catch(error => console.error("Error:", error));
         }
     </script>
 </body>
